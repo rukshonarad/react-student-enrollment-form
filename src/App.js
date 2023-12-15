@@ -12,18 +12,21 @@ class App extends React.Component {
             email: "",
             className: "",
             inputError: false,
-            showEditModal: false
+            showModal: false,
+            selectedStudent: null
         };
     }
 
     addStudent = (e) => {
         e.preventDefault();
 
+        const { firstName, lastName, email, className } = this.state;
+
         if (
-            this.state.firstName.length === 0 ||
-            this.state.lastName.length === 0 ||
-            this.state.email.length === 0 ||
-            this.state.className.length === 0
+            firstName === "" ||
+            lastName === "" ||
+            email === "" ||
+            className === ""
         ) {
             this.setState({
                 inputError: true
@@ -33,10 +36,10 @@ class App extends React.Component {
 
         const newStudent = {
             id: uuid(),
-            firstName: this.state.firstName,
-            lastName: this.state.lastName,
-            email: this.state.email,
-            className: this.state.className
+            firstName,
+            lastName,
+            email,
+            className
         };
 
         this.setState((prevState) => ({
@@ -57,67 +60,52 @@ class App extends React.Component {
     };
 
     deleteStudent = (id) => {
-        const updatedStudents = this.state.students.filter(
-            (student) => student.id !== id
+        this.setState((prevState) => ({
+            students: prevState.students.filter((student) => student.id !== id),
+            showModal: false
+        }));
+    };
+
+    openModal = (student) => {
+        this.setState({
+            showModal: true,
+            selectedStudent: student
+        });
+    };
+
+    closeModal = () => {
+        this.setState({
+            showModal: false,
+            selectedStudent: null
+        });
+    };
+
+    updateStudent = () => {
+        const { selectedStudent, students } = this.state;
+
+        const updatedStudents = students.map((student) =>
+            student.id === selectedStudent.id ? selectedStudent : student
         );
+
         this.setState({
-            students: updatedStudents
+            students: updatedStudents,
+            showModal: false,
+            selectedStudent: null
         });
     };
-    updateStudent = (studentId) => {
-        this.setState((prevState) => {
-            const updatedStudents = prevState.students.map((student) => {
-                if (student.id === studentId) {
-                    const copy = { ...student };
-                    return copy;
-                }
-                return student;
-            });
-            return {
-                students: updatedStudents
-            };
-        });
-    };
-    editStudent = (studentId) => {
-        this.setState({
-            showEditModal: true
-        });
-        let studentText = "";
-        for (const student of this.state.students) {
-            if (student.id === studentId) {
-                studentText = student.text;
-                break;
-            }
-        }
-        this.setState({
-            inputEditValue: studentText,
-            editingStudentId: studentId
-        });
-    };
-    handleInputEdit = (e) => {
-        this.setState({
-            inputEditValue: e.target.value
-        });
-    };
-    submitEdit = () => {
-        this.setState((prevState) => {
-            const updatedStudents = prevState.students.map((student) => {
-                if (student.id === this.state.editingStudentId) {
-                    const copy = {
-                        ...student,
-                        text: this.state.inputEditValue
-                    };
-                    return copy;
-                }
-                return student;
-            });
-            return {
-                students: updatedStudents,
-                showEditModal: true
-            };
-        });
-    };
+
     render() {
+        const {
+            students,
+            firstName,
+            lastName,
+            email,
+            className,
+            inputError,
+            showModal,
+            selectedStudent
+        } = this.state;
+
         return (
             <main>
                 <h1>Students Enrollment Form</h1>
@@ -126,7 +114,7 @@ class App extends React.Component {
                         placeholder="First Name"
                         type="text"
                         name="firstName"
-                        value={this.state.firstName}
+                        value={firstName}
                         onChange={this.handleInputChange}
                     />
                     <br />
@@ -135,7 +123,7 @@ class App extends React.Component {
                         placeholder="Last Name"
                         type="text"
                         name="lastName"
-                        value={this.state.lastName}
+                        value={lastName}
                         onChange={this.handleInputChange}
                     />
                     <br />
@@ -144,22 +132,26 @@ class App extends React.Component {
                         placeholder="Email"
                         type="email"
                         name="email"
-                        value={this.state.email}
+                        value={email}
                         onChange={this.handleInputChange}
                     />
                     <br />
                     <br />
-                    <input
-                        placeholder="Class"
-                        type="text"
+                    <select
                         name="className"
-                        value={this.state.className}
+                        value={className}
                         onChange={this.handleInputChange}
-                    />
+                    >
+                        <option value="">Select Class</option>
+                        <option value="Algebra">Algebra</option>
+                        <option value="Geometry">Geometry</option>
+                        <option value="Journalism">Journalism</option>
+                        <option value="Literature">Literature</option>
+                    </select>
                     <br />
                     <br />
                     <input type="submit" value="Add Student" />
-                    {this.state.inputError && <p>Please fill in all fields.</p>}
+                    {inputError && <p>Please fill in all fields.</p>}
                 </form>
                 <table>
                     <thead>
@@ -168,11 +160,11 @@ class App extends React.Component {
                             <th>Last Name</th>
                             <th>Email</th>
                             <th>Class</th>
-                            <th>Action</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {this.state.students.map((student) => (
+                        {students.map((student) => (
                             <tr key={student.id}>
                                 <td>{student.firstName}</td>
                                 <td>{student.lastName}</td>
@@ -187,9 +179,7 @@ class App extends React.Component {
                                         Delete
                                     </button>
                                     <button
-                                        onClick={() =>
-                                            this.editStudent(student.id)
-                                        }
+                                        onClick={() => this.openModal(student)}
                                     >
                                         Edit
                                     </button>
@@ -198,13 +188,95 @@ class App extends React.Component {
                         ))}
                     </tbody>
                 </table>
-                <div className="modal">
-                    <input
-                        value={this.state.inputEditValue}
-                        onChange={this.handleInputEdit}
-                    />
-                    <button onClick={this.submitEdit}>Update Student</button>
-                </div>
+                {showModal && (
+                    <div className="modal">
+                        <div className="modal-content">
+                            <span className="close" onClick={this.closeModal}>
+                                &times;
+                            </span>
+                            <h2>Edit Student</h2>
+                            {selectedStudent && (
+                                <form onSubmit={this.updateStudent}>
+                                    <input
+                                        placeholder="First Name"
+                                        type="text"
+                                        name="firstName"
+                                        value={selectedStudent.firstName}
+                                        onChange={(e) =>
+                                            this.setState({
+                                                selectedStudent: {
+                                                    ...selectedStudent,
+                                                    firstName: e.target.value
+                                                }
+                                            })
+                                        }
+                                    />
+                                    <br />
+                                    <br />
+                                    <input
+                                        placeholder="Last Name"
+                                        type="text"
+                                        name="lastName"
+                                        value={selectedStudent.lastName}
+                                        onChange={(e) =>
+                                            this.setState({
+                                                selectedStudent: {
+                                                    ...selectedStudent,
+                                                    lastName: e.target.value
+                                                }
+                                            })
+                                        }
+                                    />
+                                    <br />
+                                    <br />
+                                    <input
+                                        placeholder="Email"
+                                        type="email"
+                                        name="email"
+                                        value={selectedStudent.email}
+                                        onChange={(e) =>
+                                            this.setState({
+                                                selectedStudent: {
+                                                    ...selectedStudent,
+                                                    email: e.target.value
+                                                }
+                                            })
+                                        }
+                                    />
+                                    <br />
+                                    <br />
+                                    <select
+                                        name="className"
+                                        value={selectedStudent.className}
+                                        onChange={(e) =>
+                                            this.setState({
+                                                selectedStudent: {
+                                                    ...selectedStudent,
+                                                    className: e.target.value
+                                                }
+                                            })
+                                        }
+                                    >
+                                        <option value="">Select Class</option>
+                                        <option value="Algebra">Algebra</option>
+                                        <option value="Geometry">
+                                            Geometry
+                                        </option>
+                                        <option value="Journalism">
+                                            Journalism
+                                        </option>
+                                        <option value="Literature">
+                                            Literature
+                                        </option>
+                                    </select>
+                                    <br />
+                                    <br />
+                                    <input type="submit" value="Update" />
+                                </form>
+                            )}
+                        </div>
+                    </div>
+                )}
             </main>
         );
     }
