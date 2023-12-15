@@ -11,7 +11,8 @@ class App extends React.Component {
             lastName: "",
             email: "",
             className: "",
-            inputError: false
+            inputError: false,
+            showEditModal: false
         };
     }
 
@@ -63,7 +64,59 @@ class App extends React.Component {
             students: updatedStudents
         });
     };
-
+    updateStudent = (studentId) => {
+        this.setState((prevState) => {
+            const updatedStudents = prevState.students.map((student) => {
+                if (student.id === studentId) {
+                    const copy = { ...student };
+                    return copy;
+                }
+                return student;
+            });
+            return {
+                students: updatedStudents
+            };
+        });
+    };
+    editStudent = (studentId) => {
+        this.setState({
+            showEditModal: true
+        });
+        let studentText = "";
+        for (const student of this.state.students) {
+            if (student.id === studentId) {
+                studentText = student.text;
+                break;
+            }
+        }
+        this.setState({
+            inputEditValue: studentText,
+            editingStudentId: studentId
+        });
+    };
+    handleInputEdit = (e) => {
+        this.setState({
+            inputEditValue: e.target.value
+        });
+    };
+    submitEdit = () => {
+        this.setState((prevState) => {
+            const updatedStudents = prevState.students.map((student) => {
+                if (student.id === this.state.editingStudentId) {
+                    const copy = {
+                        ...student,
+                        text: this.state.inputEditValue
+                    };
+                    return copy;
+                }
+                return student;
+            });
+            return {
+                students: updatedStudents,
+                showEditModal: true
+            };
+        });
+    };
     render() {
         return (
             <main>
@@ -133,11 +186,25 @@ class App extends React.Component {
                                     >
                                         Delete
                                     </button>
+                                    <button
+                                        onClick={() =>
+                                            this.editStudent(student.id)
+                                        }
+                                    >
+                                        Edit
+                                    </button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+                <div className="modal">
+                    <input
+                        value={this.state.inputEditValue}
+                        onChange={this.handleInputEdit}
+                    />
+                    <button onClick={this.submitEdit}>Update Student</button>
+                </div>
             </main>
         );
     }
