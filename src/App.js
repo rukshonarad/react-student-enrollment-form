@@ -1,7 +1,6 @@
 import React from "react";
 import "./App.css";
 import { v4 as uuid } from "uuid";
-
 class App extends React.Component {
     constructor() {
         super();
@@ -16,12 +15,9 @@ class App extends React.Component {
             selectedStudent: null
         };
     }
-
     addStudent = (e) => {
         e.preventDefault();
-
         const { firstName, lastName, email, className } = this.state;
-
         if (
             firstName === "" ||
             lastName === "" ||
@@ -33,7 +29,6 @@ class App extends React.Component {
             });
             return;
         }
-
         const newStudent = {
             id: uuid(),
             firstName,
@@ -41,7 +36,6 @@ class App extends React.Component {
             email,
             className
         };
-
         this.setState((prevState) => ({
             students: [...prevState.students, newStudent],
             firstName: "",
@@ -51,49 +45,54 @@ class App extends React.Component {
             inputError: false
         }));
     };
-
-    handleInputChange = (e) => {
+    handleOnChange = (e) => {
         const { name, value } = e.target;
         this.setState({
             [name]: value
         });
     };
-
-    deleteStudent = (id) => {
-        this.setState((prevState) => ({
-            students: prevState.students.filter((student) => student.id !== id),
-            showModal: false
-        }));
+    deleteStudent = (studentId) => {
+        this.setState((prevState) => {
+            const keptStudents = prevState.students.filter(
+                (student) => student.id !== studentId
+            );
+            return {
+                students: keptStudents,
+                showModal: false
+            };
+        });
     };
-
-    openModal = (student) => {
+    editStudent = (studentId) => {
+        const selectedStudent = this.state.students.find(
+            (student) => student.id === studentId
+        );
         this.setState({
             showModal: true,
-            selectedStudent: student
+            selectedStudent
         });
     };
-
-    closeModal = () => {
-        this.setState({
-            showModal: false,
-            selectedStudent: null
+    submitEdit = () => {
+        const { selectedStudent, firstName, lastName, email, className } =
+            this.state;
+        this.setState((prevState) => {
+            const updatedStudents = prevState.students.map((student) => {
+                if (student.id === selectedStudent.id) {
+                    return {
+                        ...student,
+                        firstName,
+                        lastName,
+                        email,
+                        className
+                    };
+                }
+                return student;
+            });
+            return {
+                students: updatedStudents,
+                showModal: false
+            };
         });
     };
-
-    updateStudent = () => {
-        const { selectedStudent, students } = this.state;
-
-        const updatedStudents = students.map((student) =>
-            student.id === selectedStudent.id ? selectedStudent : student
-        );
-
-        this.setState({
-            students: updatedStudents,
-            showModal: false,
-            selectedStudent: null
-        });
-    };
-
     render() {
         const {
             students,
@@ -105,42 +104,41 @@ class App extends React.Component {
             showModal,
             selectedStudent
         } = this.state;
-
         return (
             <main>
-                <h1>Students Enrollment Form</h1>
+                <h1>Student Enrollment Form</h1>
                 <form onSubmit={this.addStudent}>
                     <input
-                        placeholder="First Name"
+                        onChange={this.handleOnChange}
+                        value={this.state.firstName}
                         type="text"
                         name="firstName"
-                        value={firstName}
-                        onChange={this.handleInputChange}
+                        placeholder="First name"
                     />
                     <br />
                     <br />
                     <input
-                        placeholder="Last Name"
+                        onChange={this.handleOnChange}
+                        value={this.state.lastName}
                         type="text"
                         name="lastName"
-                        value={lastName}
-                        onChange={this.handleInputChange}
+                        placeholder="Last name"
                     />
                     <br />
                     <br />
                     <input
-                        placeholder="Email"
+                        onChange={this.handleOnChange}
+                        value={this.state.email}
                         type="email"
                         name="email"
-                        value={email}
-                        onChange={this.handleInputChange}
+                        placeholder="Email"
                     />
                     <br />
                     <br />
                     <select
                         name="className"
                         value={className}
-                        onChange={this.handleInputChange}
+                        onChange={this.handleOnChange}
                     >
                         <option value="">Select Class</option>
                         <option value="Algebra">Algebra</option>
@@ -150,8 +148,19 @@ class App extends React.Component {
                     </select>
                     <br />
                     <br />
+                    <input
+                        onChange={this.handleOnChange}
+                        value={this.state.class}
+                        type="text"
+                        name="className"
+                        placeholder="Class name"
+                    />
+                    <br />
+                    <br />
                     <input type="submit" value="Add Student" />
-                    {inputError && <p>Please fill in all fields.</p>}
+                    {this.state.inputError && (
+                        <span>Please fill all fields</span>
+                    )}
                 </form>
                 <table>
                     <thead>
@@ -179,7 +188,9 @@ class App extends React.Component {
                                         Delete
                                     </button>
                                     <button
-                                        onClick={() => this.openModal(student)}
+                                        onClick={() =>
+                                            this.editStudent(student.id)
+                                        }
                                     >
                                         Edit
                                     </button>
@@ -190,90 +201,68 @@ class App extends React.Component {
                 </table>
                 {showModal && (
                     <div className="modal">
-                        <div className="modal-content">
-                            <span className="close" onClick={this.closeModal}>
-                                &times;
-                            </span>
-                            <h2>Edit Student</h2>
-                            {selectedStudent && (
-                                <form onSubmit={this.updateStudent}>
-                                    <input
-                                        placeholder="First Name"
-                                        type="text"
-                                        name="firstName"
-                                        value={selectedStudent.firstName}
-                                        onChange={(e) =>
-                                            this.setState({
-                                                selectedStudent: {
-                                                    ...selectedStudent,
-                                                    firstName: e.target.value
-                                                }
-                                            })
-                                        }
-                                    />
-                                    <br />
-                                    <br />
-                                    <input
-                                        placeholder="Last Name"
-                                        type="text"
-                                        name="lastName"
-                                        value={selectedStudent.lastName}
-                                        onChange={(e) =>
-                                            this.setState({
-                                                selectedStudent: {
-                                                    ...selectedStudent,
-                                                    lastName: e.target.value
-                                                }
-                                            })
-                                        }
-                                    />
-                                    <br />
-                                    <br />
-                                    <input
-                                        placeholder="Email"
-                                        type="email"
-                                        name="email"
-                                        value={selectedStudent.email}
-                                        onChange={(e) =>
-                                            this.setState({
-                                                selectedStudent: {
-                                                    ...selectedStudent,
-                                                    email: e.target.value
-                                                }
-                                            })
-                                        }
-                                    />
-                                    <br />
-                                    <br />
-                                    <select
-                                        name="className"
-                                        value={selectedStudent.className}
-                                        onChange={(e) =>
-                                            this.setState({
-                                                selectedStudent: {
-                                                    ...selectedStudent,
-                                                    className: e.target.value
-                                                }
-                                            })
-                                        }
-                                    >
-                                        <option value="">Select Class</option>
-                                        <option value="Algebra">Algebra</option>
-                                        <option value="Geometry">
-                                            Geometry
-                                        </option>
-                                        <option value="Journalism">
-                                            Journalism
-                                        </option>
-                                        <option value="Literature">
-                                            Literature
-                                        </option>
-                                    </select>
-                                    <br />
-                                    <br />
-                                    <input type="submit" value="Update" />
-                                </form>
-                            )}
+                        <h2>Edit Student</h2>
+                        <div>
+                            <input
+                                value={firstName}
+                                onChange={this.handleOnChange}
+                                type="text"
+                                name="firstName"
+                                placeholder="firstName"
+                            />
+                            <br />
+                            <br />
+                            <input
+                                value={lastName}
+                                onChange={this.handleOnChange}
+                                type="text"
+                                name="lastName"
+                                placeholder="lastName"
+                            />
+                            <br />
+                            <br />
+                            <input
+                                value={email}
+                                onChange={this.handleOnChange}
+                                type="email"
+                                name="email"
+                                placeholder="email"
+                            />
+                            <br />
+                            <br />
+                            <select
+                                name="className"
+                                value={className}
+                                onChange={this.handleOnChange}
+                            >
+                                <option value="">Select Class</option>
+                                <option value="Algebra">Algebra</option>
+                                <option value="Geometry">Geometry</option>
+                                <option value="Journalism">Journalism</option>
+                                <option value="Literature">Literature</option>
+                            </select>
+                            <br />
+                            <br />
+                            <input
+                                value={className}
+                                onChange={this.handleOnChange}
+                                type="text"
+                                name="className"
+                                placeholder="Class name"
+                            />
+                            <br />
+                            <br />
+                            <button type="button" onClick={this.submitEdit}>
+                                Save Changes
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    this.setState({ showModal: false })
+                                }
+                            >
+                                Cancel
+                            </button>
                         </div>
                     </div>
                 )}
@@ -281,5 +270,4 @@ class App extends React.Component {
         );
     }
 }
-
 export default App;
