@@ -148,15 +148,7 @@ class App extends React.Component {
                     </select>
                     <br />
                     <br />
-                    <input
-                        onChange={this.handleOnChange}
-                        value={this.state.class}
-                        type="text"
-                        name="className"
-                        placeholder="Class name"
-                    />
-                    <br />
-                    <br />
+
                     <input type="submit" value="Add Student" />
                     {this.state.inputError && (
                         <span>Please fill all fields</span>
