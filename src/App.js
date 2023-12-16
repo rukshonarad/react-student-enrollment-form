@@ -15,14 +15,15 @@ class App extends React.Component {
             selectedStudent: null
         };
     }
+
     addStudent = (e) => {
         e.preventDefault();
         const { firstName, lastName, email, className } = this.state;
         if (
-            firstName === "" ||
-            lastName === "" ||
-            email === "" ||
-            className === ""
+            firstName.length <= 1 ||
+            lastName.length <= 1 ||
+            email.length <= 1 ||
+            className.length <= 1
         ) {
             this.setState({
                 inputError: true
@@ -36,15 +37,17 @@ class App extends React.Component {
             email,
             className
         };
+
         this.setState((prevState) => ({
             students: [...prevState.students, newStudent],
             firstName: "",
             lastName: "",
             email: "",
-            className: "",
+            class: "",
             inputError: false
         }));
     };
+
     handleOnChange = (e) => {
         const { name, value } = e.target;
         this.setState({
@@ -62,6 +65,7 @@ class App extends React.Component {
             };
         });
     };
+
     editStudent = (studentId) => {
         const selectedStudent = this.state.students.find(
             (student) => student.id === studentId
@@ -74,6 +78,7 @@ class App extends React.Component {
     submitEdit = () => {
         const { selectedStudent, firstName, lastName, email, className } =
             this.state;
+
         this.setState((prevState) => {
             const updatedStudents = prevState.students.map((student) => {
                 if (student.id === selectedStudent.id) {
@@ -93,6 +98,7 @@ class App extends React.Component {
             };
         });
     };
+
     render() {
         const {
             students,
@@ -104,6 +110,7 @@ class App extends React.Component {
             showModal,
             selectedStudent
         } = this.state;
+
         return (
             <main>
                 <h1>Student Enrollment Form</h1>
@@ -148,7 +155,6 @@ class App extends React.Component {
                     </select>
                     <br />
                     <br />
-
                     <input type="submit" value="Add Student" />
                     {this.state.inputError && (
                         <span>Please fill all fields</span>
@@ -193,7 +199,6 @@ class App extends React.Component {
                 </table>
                 {showModal && (
                     <div className="modal">
-                        <h2>Edit Student</h2>
                         <div>
                             <input
                                 value={firstName}
@@ -222,11 +227,7 @@ class App extends React.Component {
                             />
                             <br />
                             <br />
-                            <select
-                                name="className"
-                                value={className}
-                                onChange={this.handleOnChange}
-                            >
+                            <select>
                                 <option value="">Select Class</option>
                                 <option value="Algebra">Algebra</option>
                                 <option value="Geometry">Geometry</option>
@@ -235,15 +236,7 @@ class App extends React.Component {
                             </select>
                             <br />
                             <br />
-                            <input
-                                value={className}
-                                onChange={this.handleOnChange}
-                                type="text"
-                                name="className"
-                                placeholder="Class name"
-                            />
-                            <br />
-                            <br />
+
                             <button type="button" onClick={this.submitEdit}>
                                 Save Changes
                             </button>
