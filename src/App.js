@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import { v4 as uuid } from "uuid";
 import { studentApi } from "./api";
 
 const AppFunction = () => {
@@ -26,6 +25,7 @@ const AppFunction = () => {
 
     const addStudent = (e) => {
         e.preventDefault();
+
         if (
             firstName.length <= 1 ||
             lastName.length <= 1 ||
@@ -35,20 +35,21 @@ const AppFunction = () => {
             setInputError(true);
             return;
         }
-        const newStudent = {
-            id: uuid(),
-            firstName,
-            lastName,
-            email,
-            className
-        };
 
-        setStudents([...students, newStudent]);
-        setFirstName("");
-        setLastName("");
-        setEmail("");
-        setClassName("");
-        setInputError(false);
+        studentApi
+            .add({ firstName, lastName, email, className })
+            .then((response) => {
+                setFirstName("");
+                setLastName("");
+                setEmail("");
+                setClassName("");
+                setStudents((prevStudents) => {
+                    return [...prevStudents, response.data];
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     const handleOnChange = (e) => {
