@@ -2,8 +2,9 @@ class StudentApi {
     constructor() {
         this.endpoint = process.env.REACT_APP_API;
     }
-    async create(input) {
-        const { firstName, lastName, email, className } = input;
+
+    async create(newStudent) {
+        const { firstName, lastName, email, className } = newStudent;
         try {
             const response = await fetch(`${this.endpoint}/students`, {
                 method: "POST",
@@ -28,6 +29,7 @@ class StudentApi {
             console.log(error.message);
         }
     }
+
     async getAll() {
         try {
             const response = await fetch(`${this.endpoint}/students`);
@@ -40,6 +42,7 @@ class StudentApi {
             console.log(error.message);
         }
     }
+
     async deleteOne(id) {
         try {
             const response = await fetch(`${this.endpoint}/students/${id}`, {
@@ -55,8 +58,9 @@ class StudentApi {
         }
     }
 
-    async update(id, input) {
-        const { firstName, lastName, email, className } = input;
+    async updateOne(id, updatedStudent) {
+        const { firstName, lastName, email, className } = updatedStudent;
+
         try {
             const response = await fetch(`${this.endpoint}/students/${id}`, {
                 method: "PATCH",
@@ -75,9 +79,12 @@ class StudentApi {
                 const data = await response.json();
                 throw new Error(data.message);
             }
+
+            return await response.json();
         } catch (error) {
             console.log(error.message);
         }
     }
 }
+
 export const studentApi = new StudentApi();

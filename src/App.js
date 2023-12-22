@@ -37,7 +37,7 @@ const AppFunction = () => {
         }
 
         studentApi
-            .add({ firstName, lastName, email, className })
+            .create({ firstName, lastName, email, className })
             .then((response) => {
                 setFirstName("");
                 setLastName("");
