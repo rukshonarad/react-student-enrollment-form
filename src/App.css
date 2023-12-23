@@ -1,85 +1,157 @@
 body {
-    font-family: "Arial", sans-serif;
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background-color: #f0f0f0;
 }
 
 main {
-    max-width: 800px;
-    margin: 50px auto;
-    background-color: #fff;
+    width: 80%;
+    margin: 0 auto;
     padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
+span {
     text-align: center;
     color: #333;
 }
 
 form {
+    margin-bottom: 20px;
+}
+
+.form-inputs {
     display: flex;
     flex-direction: column;
+    gap: 10px;
 }
 
-input,
-select {
-    margin-bottom: 10px;
-    padding: 8px;
+.form-inputs input,
+.form-inputs select {
+    width: 100%;
+    padding: 10px;
     font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
 }
 
-input[type="submit"] {
-    background-color: #af4c90;
-    color: #fff;
-    cursor: pointer;
-}
-
-span {
-    color: #f00;
+.form-inputs span {
+    color: #ff0000;
+    font-size: 14px;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    background-color: #fff;
 }
 
-th,
-td {
-    border: 1px solid #dddddd;
-    padding: 8px;
+table th,
+table td {
+    border: 1px solid #ddd;
+    padding: 10px;
     text-align: left;
 }
 
-th {
-    background-color: #af4c75;
-    color: #fff;
+.table-header {
+    background-color: #f5f5f5;
 }
 
-button {
-    padding: 8px;
-    margin-right: 5px;
+.action-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.edit-btn,
+.main-delete-btn {
+    padding: 8px 12px;
     cursor: pointer;
+    border-radius: 5px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
 }
-.modal {
-    height: 300px;
-    width: 300px;
 
-    z-index: 2;
+.edit-btn:hover,
+.main-delete-btn:hover {
+    background-color: #2980b9;
+}
 
+.delete-modal {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.modal div {
-    background: #fff;
+    background-color: #fff;
     padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border: 1px solid #000;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.confirm-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.cancel-btn,
+.delete-btn {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+}
+
+.cancel-btn {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+.delete-btn {
+    background-color: #2ecc71;
+    color: #fff;
+}
+
+.delete-btn:hover,
+.cancel-btn:hover {
+    opacity: 0.9;
+}
+
+.edit-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.edit-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.edit-cancel-btn,
+.edit-update-btn {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+}
+
+.edit-cancel-btn {
+    background-color: #e67e22;
+    color: #fff;
+}
+
+.edit-update-btn {
+    background-color: #27ae60;
+    color: #fff;
+}
+
+.edit-update-btn:hover,
+.edit-cancel-btn:hover {
+    opacity: 0.9;
 }
