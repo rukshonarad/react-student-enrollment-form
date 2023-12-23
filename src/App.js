@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "./index.css";
+import "./App.css";
 import { v4 as uuid } from "uuid";
 import { studentApi } from "./api";
 
